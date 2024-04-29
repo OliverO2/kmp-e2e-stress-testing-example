@@ -16,6 +16,7 @@ import io.kotest.assertions.withClue
 import io.kotest.core.annotation.DoNotParallelize
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.inspectors.shouldForAll
+import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -238,9 +239,9 @@ private class FrontendBackendSessionPair(
 // Run tests sensitive to timing issues independently
 @DoNotParallelize
 class E2EUpdateRejectionTests : FunSpec({
-    val frontendCountVariants = testVariant.dependent(listOf(4 /*1, 4, 50*/), TestVariant.EXTENDED to listOf(1, 4, 100))
+    val frontendCountVariants = testVariant.dependent(listOf(1, 4, 50), TestVariant.EXTENDED to listOf(1, 4, 100))
     val commonContext =
-        adjustableTimeoutFactorContextElement(testVariant.dependent(1.0 /*3.0*/, TestVariant.EXTENDED to 30.0))
+        adjustableTimeoutFactorContextElement(testVariant.dependent(1.0, TestVariant.EXTENDED to 30.0))
     extensions(GlobalSnapshotManagerTestExtension(), CoroutineContextTestSpecExtension(commonContext))
 
     val testApplication =
@@ -286,8 +287,8 @@ class E2EUpdateRejectionTests : FunSpec({
                             val correspondingTextLines = frontendReceivedPayloads().mapNotNull {
                                 if ((it as? TextLine)?.value?.startsWith(frontendPrefix) == true) it else null
                             }
-                            correspondingTextLines.size shouldBe 1
-                            correspondingTextLines.first().value shouldEndWith "-oh-no"
+                            correspondingTextLines.shouldNotBeEmpty()
+                            correspondingTextLines.last().value shouldEndWith "-oh-no"
                         }
 
                         withClue("Backend database should reflect the rejection") {

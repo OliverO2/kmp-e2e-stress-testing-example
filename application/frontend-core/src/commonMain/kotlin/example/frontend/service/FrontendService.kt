@@ -171,7 +171,7 @@ abstract class FrontendService(val testConfiguration: TestConfiguration? = null)
         } else {
             processIncomingPayload(event.payload)
         }
-        debugTrace?.log("processed incoming $event")
+        // debugTrace?.log("processed incoming $event")
         testConfiguration?.incomingEventProcessedInterceptor?.invoke(event)
     }
 

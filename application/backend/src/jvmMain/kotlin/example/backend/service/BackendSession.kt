@@ -207,8 +207,8 @@ abstract class BackendSession(private val service: BackendService) : EventSource
                 logger.debug { "${this@BackendSession} received $event" }
                 testConfiguration?.receiveInterceptor?.invoke(event)
                 processIncomingEvent(event)
-                debugTrace?.log { "processed incoming $event" }
-                logger.debug { "${this@BackendSession} processed incoming $event" }
+                // debugTrace?.log { "processed incoming $event" }
+                // logger.debug { "${this@BackendSession} processed incoming $event" }
                 testConfiguration?.incomingEventProcessedInterceptor?.invoke(event)
             }
         }

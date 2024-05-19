@@ -42,6 +42,10 @@ fun TextLineView(service: FrontendService, viewModel: TextLineViewModel) {
 
     ComposeNode<ViewNode.Text, ViewNode.Applier>(
         factory = { ViewNode.Text(service, viewModel) },
-        update = { set(viewModel.value) { content = it } }
+        update = {
+            set(viewModel.value) { newValue ->
+                content = newValue
+            }
+        }
     )
 }

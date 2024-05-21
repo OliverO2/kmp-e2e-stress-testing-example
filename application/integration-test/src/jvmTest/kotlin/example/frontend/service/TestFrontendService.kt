@@ -10,6 +10,7 @@ import kotlinx.coroutines.withContext
 import library.core.SuspendCloseable
 import library.core.createDebugTrace
 import library.core.debugTrace
+import library.core.loggingInsteadEnabled
 import library.core.removeDebugTrace
 import library.core.simpleClassName
 import library.telemetry.LogEvent
@@ -51,7 +52,9 @@ class TestFrontendService(
             emitViaSlf4J(logEvent)
         } else {
             testConfiguration?.let { testConfiguration ->
-                debugTrace?.log(testConfiguration.frontendCoroutineScope.coroutineContext) { "$logEvent" }
+                if (!loggingInsteadEnabled) {
+                    debugTrace?.log(testConfiguration.frontendCoroutineScope.coroutineContext) { "$logEvent" }
+                }
             } ?: emitViaSlf4J(logEvent)
         }
     }

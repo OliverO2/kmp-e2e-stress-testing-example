@@ -1,4 +1,6 @@
-## Operations
+## End-to-End Stress Testing with Kotlin Multiplatform
+
+This is an event-based example application. It features collaborative editing of text lines with desktop (JVM) and browser (JS) frontends.
 
 ### Running The Application
 
@@ -28,36 +30,15 @@
 * `./gradlew --no-build-cache --no-configuration-cache -p application/integration-test cleanJvmTest jvmTest --tests E2EUpdateRejectionTests`
 * `./gradlew --no-build-cache --no-configuration-cache -p application/integration-test cleanJvmTest jvmTest --tests E2EMassUpdateTests`
 
-#### Extended Tests
+#### Test With Fixed Frontend Count
 
-* `./gradlew --no-build-cache --no-configuration-cache -p application/integration-test -Dapplication.test.variant=extended cleanJvmTest jvmTest`
-* `./gradlew --no-build-cache --no-configuration-cache -p application/integration-test -Dapplication.test.variant=extended cleanJvmTest jvmTest --tests E2EUpdateRejectionTests`
-* `./gradlew --no-build-cache --no-configuration-cache -p application/integration-test -Dapplication.test.variant=extended cleanJvmTest jvmTest --tests E2EMassUpdateTests`
+* `./gradlew --no-build-cache --no-configuration-cache -p application/integration-test -D application.test.fixedFrontendCount=4 cleanJvmTest jvmTest --tests E2EUpdateRejectionTests`
+* `./gradlew --no-build-cache --no-configuration-cache -p application/integration-test -D application.test.fixedFrontendCount=4 -D application.test.debugTrace.loggingInsteadEnabled=true cleanJvmTest jvmTest --tests E2EUpdateRejectionTests`
 
-#### Code Coverage
+#### Test With Intentional Defect
 
-Generate code coverage data by running the Gradle task `integrationJvmTest` (or any other relevant one) with
-the `application.coverage=true` system property set:
+* `./gradlew --no-build-cache --no-configuration-cache -p application/integration-test -D application.test.defectCountdown=2 -D application.test.fixedFrontendCount=4 cleanJvmTest jvmTest --tests E2EUpdateRejectionTests`
 
-* `./gradlew -Dapplication.coverage=true cleanAllTests allTests`
-* `./gradlew -Dapplication.coverage=true -p application/integration-test cleanAllTests allTests`
+#### Test With Intentional Defect: Logging instead of DebugTrace
 
-NOTE: Kover generates coverage data for main classes only, not test classes.
-
-To show coverage data in IDEA:
-
-1. Select menu item _Run – Show Coverage Data_ (Ctrl+Alt+F6).
-
-2. Add files found via `find application -name \*.ic`.
-
-3. Select _Show Coverage_.
-
-### Monitoring, Runtime Analysis
-
-* CPU, Threads, Memory in IntelliJ IDEA
-    * Integrated Window, all options: _Profiler_ Tool Window -> Right click on
-      process -> [CPU and Memory Live Charts](https://www.jetbrains.com/help/idea/cpu-and-memory-live-charts.html)
-    * Separate window, minimal
-      options: `Ctrl+Shift+A` [CPU and Memory Live Charts](https://www.jetbrains.com/help/idea/cpu-and-memory-live-charts.html) ->
-      Use drop-down to select process
-* [Introduction to profiling | IntelliJ IDEA](https://www.jetbrains.com/help/idea/profiler-intro.html#when-is-profiling-helpful)
+* `./gradlew --no-build-cache --no-configuration-cache -p application/integration-test -D application.test.defectCountdown=2 -D application.test.fixedFrontendCount=4 -D application.test.debugTrace.loggingInsteadEnabled=true -Dlogback.configurationFile=/Users/oliver/IdeaProjects/kmp-e2e-stress-testing/example/logback-debug-configuration.xml cleanJvmTest jvmTest --tests E2EUpdateRejectionTests`

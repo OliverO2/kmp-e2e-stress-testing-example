@@ -11,7 +11,7 @@ tasks.withType<Test>().configureEach {
     // Pass "application.test.*" system properties from the Gradle invocation to the test launcher.
     // https://junit.org/junit5/docs/current/user-guide/#running-tests-config-params
     for ((name, value) in System.getProperties()) {
-        if (name is String && name.startsWith("application.test.")) {
+        if (name is String && (name.startsWith("application.test.") || name.startsWith("logback."))) {
             systemProperty(name, value)
         }
     }

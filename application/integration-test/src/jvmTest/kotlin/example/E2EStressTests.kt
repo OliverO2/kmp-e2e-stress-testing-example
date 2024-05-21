@@ -239,7 +239,10 @@ private class FrontendBackendSessionPair(
 // Run tests sensitive to timing issues independently
 @DoNotParallelize
 class E2EUpdateRejectionTests : FunSpec({
-    val frontendCountVariants = testVariant.dependent(listOf(1, 4, 50), TestVariant.EXTENDED to listOf(1, 4, 100))
+    val frontendCountVariants =
+        fixedFrontendCount?.let {
+            listOf(it)
+        } ?: testVariant.dependent(listOf(1, 4, 50), TestVariant.EXTENDED to listOf(1, 4, 100))
     val commonContext =
         adjustableTimeoutFactorContextElement(testVariant.dependent(1.0, TestVariant.EXTENDED to 30.0))
     extensions(GlobalSnapshotManagerTestExtension(), CoroutineContextTestSpecExtension(commonContext))
@@ -288,15 +291,15 @@ class E2EUpdateRejectionTests : FunSpec({
                                 if ((it as? TextLine)?.value?.startsWith(frontendPrefix) == true) it else null
                             }
                             correspondingTextLines.shouldNotBeEmpty()
-                            correspondingTextLines.last().value shouldEndWith "-oh-no"
+                            correspondingTextLines.last().value shouldEndWith "-done"
                         }
 
                         withClue("Backend database should reflect the rejection") {
-                            backendService.textLine(frontendIndex).value shouldBe "$frontendPrefix-oh-no"
+                            backendService.textLine(frontendIndex).value shouldBe "$frontendPrefix-done"
                         }
 
                         eventuallyTimestamped(5.seconds, "Waiting for the frontend to revert its change") {
-                            frontend.textViewNode(frontendIndex).content shouldBe "$frontendPrefix-oh-no"
+                            frontend.textViewNode(frontendIndex).content shouldBe "$frontendPrefix-done"
                         }
                     }
                 }
@@ -308,7 +311,7 @@ class E2EUpdateRejectionTests : FunSpec({
 // Run tests sensitive to timing issues independently
 @DoNotParallelize
 class E2EMassUpdateTests : FunSpec({
-    val frontendCount = testVariant.dependent(50, TestVariant.EXTENDED to 100)
+    val frontendCount = fixedFrontendCount ?: testVariant.dependent(50, TestVariant.EXTENDED to 100)
     val maximumUpdateDuration = testVariant.dependent(10.seconds, TestVariant.EXTENDED to 40.seconds)
     val commonContext = adjustableTimeoutFactorContextElement(testVariant.dependent(1.0, TestVariant.EXTENDED to 4.0))
 
@@ -440,3 +443,5 @@ class E2EMassUpdateTests : FunSpec({
         }
     }
 })
+
+private var fixedFrontendCount = System.getProperty("application.test.fixedFrontendCount")?.toIntOrNull()

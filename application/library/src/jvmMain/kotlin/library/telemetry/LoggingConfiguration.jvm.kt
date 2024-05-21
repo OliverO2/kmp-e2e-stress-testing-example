@@ -23,7 +23,7 @@ private val initialConfiguration = LoggingConfiguration("JVM-default", ::emitVia
  * Emits [logEvent] via SLF4J.
  */
 fun emitViaSlf4J(logEvent: LogEvent) {
-    val loggerName = logEvent.abbreviatedPath
+    val loggerName = logEvent.path
 
     val logMessage = if (logEvent.exceptionDetails != null && logEvent.exception == null) {
         "${logEvent.message}\n${logEvent.exceptionDetails}"

@@ -4,6 +4,7 @@ package example.backend.database
 
 import example.transport.Slate
 import example.transport.TextLine
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -68,12 +69,21 @@ class Database(
     suspend fun update(candidateTextLine: TextLine) = commitMutex.withLock {
         val committedTextLine: TextLine
         if (candidateTextLine.value.endsWith("-reject")) {
-            logger.debug { "rejecting update $candidateTextLine" }
-            committedTextLine = TextLine(
-                candidateTextLine.id,
-                candidateTextLine.value.replace("-reject", "-oh-no"),
-                null
-            )
+            if (intentionalDefectCountdown?.decrementAndGet() == 0) {
+                logger.debug { "failing to reject $candidateTextLine" }
+                committedTextLine = TextLine(
+                    candidateTextLine.id,
+                    candidateTextLine.value.replace("-reject", "-oh-no"),
+                    null
+                )
+            } else {
+                logger.debug { "rejecting update $candidateTextLine" }
+                committedTextLine = TextLine(
+                    candidateTextLine.id,
+                    candidateTextLine.value.replace("-reject", "-done"),
+                    null
+                )
+            }
         } else {
             logger.debug { "updating $candidateTextLine" }
             committedTextLine = candidateTextLine
@@ -87,4 +97,8 @@ class Database(
     }
 
     override fun toString(): String = "$simpleClassName(\"$name\")"
+}
+
+var intentionalDefectCountdown = System.getProperty("application.test.defectCountdown")?.toIntOrNull()?.let {
+    atomic(it)
 }

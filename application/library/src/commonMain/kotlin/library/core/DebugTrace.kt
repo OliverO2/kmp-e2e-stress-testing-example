@@ -12,6 +12,9 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
 
 private val logger = Telemetry.logger("library.core.DebugTraceKt")
+private val traceLogger = Telemetry.logger("library.core.DebugTrace.traceLogger")
+
+expect val loggingInsteadEnabled: Boolean
 
 /**
  * A container for object-specific, time-stamped log messages.
@@ -31,7 +34,11 @@ class DebugTrace private constructor(private val target: DebugTraceTarget) : Syn
      */
     fun log(coroutineContext: CoroutineContext?, message: String) = synchronized(this) {
         val coroutineInfo = coroutineContext?.get(CoroutineName)?.name?.let { " [$it]" } ?: ""
-        messageLines.add("${Clock.System.now()}$coroutineInfo: $message")
+        if (loggingInsteadEnabled) {
+            traceLogger.debug { "${Clock.System.now()}$coroutineInfo: $message" }
+        } else {
+            messageLines.add("${Clock.System.now()}$coroutineInfo: $message")
+        }
     }
 
     /**

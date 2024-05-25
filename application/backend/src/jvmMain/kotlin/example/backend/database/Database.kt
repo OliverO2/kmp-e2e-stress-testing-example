@@ -68,19 +68,19 @@ class Database(
 
     suspend fun update(candidateTextLine: TextLine) = commitMutex.withLock {
         val committedTextLine: TextLine
-        if (candidateTextLine.value.endsWith("-reject")) {
+        if (candidateTextLine.value.endsWith("-do")) {
             if (intentionalDefectCountdown?.decrementAndGet() == 0) {
                 logger.debug { "failing to reject $candidateTextLine" }
                 committedTextLine = TextLine(
                     candidateTextLine.id,
-                    candidateTextLine.value.replace("-reject", "-oh-no"),
+                    candidateTextLine.value.replace("-do", "-oh-no"),
                     null
                 )
             } else {
                 logger.debug { "rejecting update $candidateTextLine" }
                 committedTextLine = TextLine(
                     candidateTextLine.id,
-                    candidateTextLine.value.replace("-reject", "-done"),
+                    candidateTextLine.value.replace("-do", "-done"),
                     null
                 )
             }

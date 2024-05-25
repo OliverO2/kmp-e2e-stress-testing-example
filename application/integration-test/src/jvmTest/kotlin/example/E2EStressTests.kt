@@ -282,7 +282,7 @@ class E2EUpdateRejectionTests : FunSpec({
                         ) {
                             frontendReceiveGate.keepClosed {
                                 backendService.updateTextComponent(frontendIndex, "$frontendPrefix-b")
-                                frontend.updateTextView(frontendIndex, "$frontendPrefix-reject")
+                                frontend.updateTextView(frontendIndex, "$frontendPrefix-do")
                             }
                         }
 
